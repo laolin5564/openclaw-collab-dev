@@ -88,6 +88,7 @@ Ask user these questions one round at a time (don't dump all at once). Stop aski
 5. **Real-time needs**: Does anything need live updates across tabs/users?
 6. **Auth**: Does it need login/registration?
 7. **Platform**: Desktop-first, mobile-first, or both equally?
+8. **Tech stack**: What language/framework? (default: Node.js + Express, but any stack works)
 
 Skip questions the user already answered. If user says "你决定" or "随便", make reasonable defaults and state them.
 
@@ -104,6 +105,7 @@ Skip Phase -1 entirely if user already provides a detailed spec or PRD.
 Write `spec.md` with:
 - Data model (shared vs private)
 - Features with priority (P0/P1/P2)
+- Tech stack (from Phase -1, or user's preference)
 - Interaction: `.hidden` class toggle for modals
 - SSE scope + exclude current connection
 - Security: enum field whitelists
@@ -139,24 +141,25 @@ Quality gate: verify design.md names appear in code.
 
 ### Phase 2: Infrastructure + Skeleton (OpenClaw)
 
-Write server.js with:
-- `path.join(__dirname, 'app.db')` for DB path
-- `process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex')`
-- `await bcrypt.hash()` / `await bcrypt.compare()` (never Sync)
-- Prepared statements, enum whitelists, input trim + length limits
-- SSE: uuid as map key, online = deduplicated userId count, `broadcastToUser(userId, event, data, excludeConnId)`
-- Heartbeat 30s + connection cleanup
+Write server/backend with:
+- DB path: absolute, relative to project root (not CWD-dependent)
+- Auth secrets: read from env var, with secure random fallback (never hardcode)
+- Password hashing: async only (never block main thread/event loop)
+- SQL: prepared statements / parameterized queries (never string concat)
+- Input validation: enum fields use whitelist, strings trimmed + length-limited
+- Real-time (if needed): unique connection ID, online count = deduplicated user count, broadcast excludes sender's connection
+- Heartbeat for long connections (30s interval + cleanup)
 
-Integrate Gemini code:
-- Add ids (don't change styles)
-- Remove sample data
-- Verify `.hidden` class mechanism
-- Place empty-state elements **outside** grid containers
-- Use event delegation (no inline onclick)
+Integrate Gemini's UI code:
+- Add element IDs for JS binding (don't change styles)
+- Remove sample/placeholder data
+- Verify `.hidden` class mechanism works
+- Place empty-state elements outside repeating containers
+- Use event delegation (no inline event handlers)
 
-Save snapshot: `cp public/index.html public/index.html.gemini-original`
+Save Gemini's original UI: `cp <ui-file> <ui-file>.gemini-original`
 
-Inject JS skeleton with `// TODO` markers:
+Inject skeleton with TODO markers:
 ```
 // TODO: functionName — description
 // Input: params
@@ -178,32 +181,30 @@ Fallback: if no file change in 3min → kill, OpenClaw fills.
 
 ### Phase 4: Automated Validation (OpenClaw)
 
-```bash
-# 4a. Completeness
-node --check server.js
-grep -c "// TODO:" server.js public/index.html  # must be 0
+Phase 4 checks (adapt commands to project's tech stack):
 
-# 4b. Design consistency
-# diff design.md names vs code names
+**4a. Completeness**
+- Syntax check passes (language-appropriate tool)
+- Zero TODO markers remaining
 
-# 4c. CSS/JS integration
-for cls in hidden loading active; do
-  JS=$(grep -c "classList.*'$cls'" public/index.html)
-  CSS=$(grep -c "\.$cls" public/index.html)
-  [ "$JS" -gt 0 ] && [ "$CSS" -eq 0 ] && echo "⚠️ .$cls missing CSS"
-done
-grep -n "display: none" public/index.html | grep -v "\.hidden" | grep -v "@media"
+**4b. Design consistency**
+- CSS class/variable names in code match design.md definitions
 
-# 4d. Security
-grep "process.env.JWT_SECRET" server.js        # must exist
-grep -c "hashSync\|compareSync" server.js      # must be 0
+**4c. CSS/JS integration**
+- Every class toggled by JS has corresponding CSS rules
+- No inline `display:none` outside `.hidden` class and media queries
 
-# 4e. DOM structure
-grep -c "onclick=" public/index.html           # target: 0
+**4d. Security**
+- Auth secrets come from env vars (no hardcoded strings)
+- Password hashing is async
+- No raw SQL string concatenation
 
-# 4f. Spec coverage
-# check each acceptance criterion: P0 all green
-```
+**4e. DOM/UI structure**
+- No inline event handlers (onclick= etc.)
+- Empty-state elements outside repeating containers
+
+**4f. Spec coverage**
+- All P0 acceptance criteria have corresponding implementation
 
 ### Phase 5: Self-review + Fix
 

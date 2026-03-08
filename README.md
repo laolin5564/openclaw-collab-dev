@@ -89,9 +89,9 @@ Phase 1a  Gemini 写 design.md
 Phase 1b  Gemini 写 index.html
             └── 纯表现层代码，不含 JS 逻辑
               ↓
-Phase 2   OpenClaw 写 server.js + 注入 JS 骨架
-            ├── 安全模板（JWT · bcrypt · 白名单 · 参数化查询）
-            ├── SSE 模板（uuid key · 排除当前连接 · 心跳）
+Phase 2   OpenClaw 写后端骨架 + 注入 JS 骨架
+            ├── 安全原则（认证密钥 · 异步哈希 · 白名单 · 参数化查询）
+            ├── 实时连接（唯一 ID · 排除当前连接 · 心跳）
             └── // TODO 标记（含步骤说明）
               ↓
 Phase 3   Claude Code 填 TODO ←同时→ Codex 预审骨架
@@ -232,8 +232,8 @@ multi-agent build 一个投票系统
    └── index.html — 纯 UI 代码，不含逻辑
 
 4. OpenClaw 自动写后端骨架 + 注入 JS 框架
-   ├── server.js — 认证、数据库、API、SSE
-   └── index.html — 补充 JS 骨架，标记 // TODO
+   ├── server/backend code — 认证、数据库、API、实时连接
+   └── frontend code — 补充 JS 骨架，标记 // TODO
 
 5. Claude Code 自动填充业务逻辑（约 3-5 分钟）
    └── 只改 // TODO 标记的函数体，不动 UI
@@ -259,9 +259,9 @@ multi-agent build 一个投票系统
 your-project/
 ├── spec.md              ← 需求规格
 ├── design.md            ← Gemini 设计规范
-├── server.js            ← 后端（Express + SQLite + JWT + SSE）
-├── public/index.html    ← 前端（Gemini UI + Claude 逻辑）
-├── package.json
+├── server/backend code  ← 后端（语言/框架由 spec.md 决定）
+├── frontend code        ← 前端（Gemini UI + Claude 逻辑）
+├── package.json         ← (如适用)
 └── review.md            ← Codex 代码审查报告
 ```
 
