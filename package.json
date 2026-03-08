@@ -1,0 +1,8 @@
+{
+  "name": "collab-dev",
+  "version": "9.0.0",
+  "description": "Multi-agent collaborative development skill for OpenClaw",
+  "keywords": ["openclaw", "skill", "multi-agent", "collaboration", "gemini", "claude", "codex"],
+  "author": "laolin5564",
+  "license": "MIT"
+}
