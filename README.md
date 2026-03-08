@@ -25,6 +25,19 @@
 
 collab-dev 让 **4 个 Agent 各司其职**：
 
+### Solo（左）vs 协作（右）实际对比
+
+**桌面端**：协作版双栏布局 + 渐变色系统，Solo 版单栏朴素布局
+![桌面端对比](assets/comparison-desktop.png)
+
+**移动端**：协作版保持双栏自适应，Solo 版线性堆叠
+![移动端对比](assets/comparison-mobile.png)
+
+**登录页**：Solo 版全屏沉浸式，协作版模态弹窗 + 背景可见
+![登录页对比](assets/comparison-login.png)
+
+> 以上截图来自第 7 轮双盲测试（Pomodoro 番茄钟），左侧 Solo 版由 Claude Code 独立完成，右侧协作版由 Gemini + Claude Code + Codex 协作完成。
+
 ```
 🎨 Gemini ── 设计规范 + UI 代码（配色、动效、响应式）
      ↓
