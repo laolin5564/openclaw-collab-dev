@@ -196,9 +196,18 @@ cd collab-dev/examples/pomodoro-solo && npm install && PORT=3002 node server.js
 
 详细评分 → [examples/README.md](examples/README.md)
 
-## 使用
+## 使用指南
 
-对 OpenClaw 说：
+### 前提条件
+
+确保你已经：
+1. 安装了 [OpenClaw](https://github.com/openclaw/openclaw) 并正常运行
+2. 安装并登录了 Gemini CLI、Claude Code、Codex CLI（见顶部表格）
+3. OpenClaw 的 ACP 配置已就绪（首次触发 skill 时会自动检查）
+
+### 触发方式
+
+对 OpenClaw 说以下任意一句即可触发协作开发流程：
 
 ```
 协作开发一个番茄钟应用
@@ -206,7 +215,70 @@ collab dev a dashboard
 multi-agent build 一个投票系统
 ```
 
-OpenClaw 自动执行 Phase 0→8 完整流程。
+### 完整使用流程
+
+```
+1. 你告诉 OpenClaw 要做什么项目
+   └── "协作开发一个在线投票系统"
+
+2. OpenClaw 自动写 spec.md（需求规格）
+   └── 你可以检查并修改，满意后继续
+
+3. Gemini 自动生成设计规范 + UI 代码（约 2-3 分钟）
+   ├── design.md — CSS 变量、配色、命名规范
+   └── index.html — 纯 UI 代码，不含逻辑
+
+4. OpenClaw 自动写后端骨架 + 注入 JS 框架
+   ├── server.js — 认证、数据库、API、SSE
+   └── index.html — 补充 JS 骨架，标记 // TODO
+
+5. Claude Code 自动填充业务逻辑（约 3-5 分钟）
+   └── 只改 // TODO 标记的函数体，不动 UI
+
+6. OpenClaw 自动验证
+   ├── 语法检查 + TODO 残留 = 0
+   ├── 设计一致性 + CSS/JS 交叉检查
+   ├── 安全审查 + DOM 结构检查
+   └── Spec 覆盖率（P0 全绿）
+
+7. Codex 自动做代码审查 → 生成 review.md
+
+8. OpenClaw 根据 review 修复问题 → 交付
+```
+
+**全程自动，预计 10-17 分钟。** 你只需要在第 1 步描述需求，第 2 步确认 spec。
+
+### 输出文件
+
+完成后项目目录结构：
+
+```
+your-project/
+├── spec.md              ← 需求规格
+├── design.md            ← Gemini 设计规范
+├── server.js            ← 后端（Express + SQLite + JWT + SSE）
+├── public/index.html    ← 前端（Gemini UI + Claude 逻辑）
+├── package.json
+└── review.md            ← Codex 代码审查报告
+```
+
+### 配置要求（OpenClaw）
+
+如果 Claude Code / Codex 通过 ACP 调用失败，检查 `openclaw.json`：
+
+```json
+{
+  "plugins": {
+    "acpx": {
+      "config": {
+        "permissionMode": "approve-all"
+      }
+    }
+  }
+}
+```
+
+更多排查 → [references/troubleshooting.md](references/troubleshooting.md)
 
 ## 相关
 
