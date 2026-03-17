@@ -1,5 +1,5 @@
 <p align="center">
-  <h1 align="center">🤝 collab-dev</h1>
+  <h1 align="center">🤝 OpenClaw Collab Dev</h1>
   <p align="center">
     Multi-agent collaborative development skill for <a href="https://github.com/openclaw/openclaw">OpenClaw</a><br/>
     <em>七轮 A/B 双盲测试验证 · 9 个版本迭代 · 每条规则都来自真实 bug</em>
